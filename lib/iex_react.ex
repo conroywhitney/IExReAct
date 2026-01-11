@@ -3,58 +3,68 @@ defmodule IExReAct do
   A minimal ReAct agent for IEx demonstrating safe tool use.
   """
 
-  alias Jido.AI.Agent
+  alias Jido.AI.Model
+  alias Jido.AI.Prompt
 
   @default_model "claude-opus-4-5-20251101"
   @default_timeout 30_000
-  @agent_key :iex_react_agent
 
-  @prompt """
+  @base_prompt """
   You are a helpful assistant with access to safe file and URL tools.
   You can read, write, and list files within the vault directory.
   You can fetch content from allowlisted URLs (github.com, hexdocs.pm, etc.).
-
-  <%= @message %>
   """
 
   def start(opts \\ []) do
-    model = Keyword.get(opts, :model, @default_model)
+    model_name = Keyword.get(opts, :model, @default_model)
 
-    result =
-      Agent.start_link(
-        ai: [
-          model: {:anthropic, model: model},
-          prompt: @prompt,
-          tools: IExReAct.Actions.all()
-        ]
-      )
+    case Model.from({:anthropic, model: model_name}) do
+      {:ok, model} ->
+        state = %{
+          model: model,
+          tools: IExReAct.Actions.all(),
+          history: []
+        }
 
-    case result do
-      {:ok, pid} ->
-        Process.put(@agent_key, pid)
-        {:ok, pid}
+        Process.put(:iex_react_state, state)
+        {:ok, self()}
 
-      error ->
-        error
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
   def chat(message, opts \\ []) do
     timeout = Keyword.get(opts, :timeout, @default_timeout)
 
-    case Process.get(@agent_key) do
+    case Process.get(:iex_react_state) do
       nil ->
         {:error, :not_started}
 
-      pid ->
-        {:ok, signal} = Jido.Signal.new(%{
-          type: "jido.ai.tool.response",
-          data: %{message: message}
-        })
+      state ->
+        prompt =
+          Prompt.new(:user, @base_prompt <> "\n\n" <> message)
 
-        case Jido.Agent.Server.call(pid, signal, timeout) do
-          {:ok, response} ->
-            IO.puts(format_response(response))
+        params = %{
+          model: state.model,
+          prompt: prompt,
+          tools: state.tools,
+          verbose: Keyword.get(opts, :verbose, false)
+        }
+
+        # Call the action directly with our timeout
+        case Jido.Exec.run(
+               Jido.AI.Actions.Langchain.ToolResponse,
+               params,
+               %{},
+               timeout: timeout
+             ) do
+          {:ok, %{result: result}} ->
+            IO.puts(format_response(result))
+            :ok
+
+          {:ok, result} ->
+            IO.puts(format_response(result))
             :ok
 
           {:error, reason} ->
@@ -64,20 +74,19 @@ defmodule IExReAct do
   end
 
   def history do
-    case Process.get(@agent_key) do
+    case Process.get(:iex_react_state) do
       nil -> {:error, :not_started}
-      _pid -> {:ok, []}  # TODO: implement history retrieval
+      state -> {:ok, state.history}
     end
   end
 
   def clear do
-    case Process.get(@agent_key) do
+    case Process.get(:iex_react_state) do
       nil ->
         {:error, :not_started}
 
-      pid ->
-        Process.delete(@agent_key)
-        Process.exit(pid, :normal)
+      _state ->
+        Process.delete(:iex_react_state)
         :ok
     end
   end
