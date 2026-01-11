@@ -25,7 +25,8 @@ This change introduces a minimal IEx-based ReAct agent that demonstrates:
 
 - **New capability**: `iex-react-agent` — first spec in this project
 - **Affected code**: Creates new project structure from scratch
-- **Dependencies**: `jido ~> 1.2.0`, `jido_ai ~> 0.5.2`
+- **Dependencies**: `jido ~> 1.2.0`, `jido_ai ~> 0.5.2`, `dotenvy ~> 0.8`
+- **Default model**: `claude-opus-4-5-20251101` (configurable via `start/1`)
 - **Security model**: No external sandboxing required (no Docker, FUSE, fanotify)
 
 ## Success Criteria

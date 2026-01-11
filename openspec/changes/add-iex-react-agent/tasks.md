@@ -5,8 +5,10 @@
 - [ ] 1.1 Initialize Mix project with `mix new iex_react`
 - [ ] 1.2 Configure `mix.exs` with dependencies (`jido ~> 1.2.0`, `jido_ai ~> 0.5.2`)
 - [ ] 1.3 Create `config/config.exs` with Jido AI keyring configuration
-- [ ] 1.4 Create `vault/` directory with `.gitkeep`
-- [ ] 1.5 Update `.gitignore` to exclude `vault/*` contents but keep structure
+- [ ] 1.4 Create `.env.example` with `ANTHROPIC_API_KEY=your-key-here`
+- [ ] 1.5 Add `dotenvy` dependency for .env file loading
+- [ ] 1.6 Create `vault/` directory with `.gitkeep`
+- [ ] 1.7 Update `.gitignore` to exclude `.env` and `vault/*` contents
 
 ## 2. Core Implementation
 

@@ -18,8 +18,8 @@ The system SHALL provide functions to start, manage, and reset the ReAct agent w
 #### Scenario: Starting with custom model
 
 - **GIVEN** an IEx session with the project loaded
-- **WHEN** the user calls `IExReAct.start(model: "claude-3-5-sonnet-20241022")`
-- **THEN** the agent starts with the specified model
+- **WHEN** the user calls `IExReAct.start(model: "claude-sonnet-4-20250514")`
+- **THEN** the agent starts with the specified model instead of the default `claude-opus-4-5-20251101`
 - **AND** the function returns `{:ok, pid}`
 
 #### Scenario: Clearing conversation

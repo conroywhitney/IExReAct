@@ -132,7 +132,7 @@ end
 ┌─────────────────────────────────────────────────────┐
 │              Jido.AI.Agent (GenServer)              │
 ├─────────────────────────────────────────────────────┤
-│  - Model: {:anthropic, "claude-3-haiku-20240307"}   │
+│  - Model: {:anthropic, "claude-opus-4-5-20251101"}  │
 │  - Prompt: System prompt with persona + tools       │
 │  - Skills: [IExReAct.SafeToolsSkill]               │
 └─────────────────────────────────────────────────────┘
@@ -163,8 +163,8 @@ Not applicable — this is a greenfield implementation with no existing code to 
 
 ## Open Questions
 
-1. **Model selection**: Should we support model switching at runtime, or is Haiku-only sufficient for MVP?
-   - Current decision: Accept model as option to `start/1`, default to Haiku
+1. **Model selection**: Should we support model switching at runtime, or is Opus-only sufficient for MVP?
+   - Current decision: Accept model as option to `start/1`, default to `claude-opus-4-5-20251101`
 
 2. **Vault location**: Should vault be configurable, or always `./vault`?
    - Current decision: Hardcoded for simplicity, can add config later
