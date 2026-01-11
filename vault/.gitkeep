@@ -1,0 +1,2 @@
+# This directory is the safe zone for agent file operations.
+# Contents are gitignored except this file.

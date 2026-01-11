@@ -13,3 +13,10 @@ erl_crash.dump
 .claudebox/
 
 .DS_Store
+
+# Environment
+.env
+
+# Vault contents (keep structure)
+/vault/*
+!/vault/.gitkeep
