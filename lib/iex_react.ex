@@ -6,6 +6,7 @@ defmodule IExReAct do
   alias Jido.AI.Agent
 
   @default_model "claude-opus-4-5-20251101"
+  @default_timeout 30_000
   @agent_key :iex_react_agent
 
   @prompt """
@@ -38,13 +39,20 @@ defmodule IExReAct do
     end
   end
 
-  def chat(message) do
+  def chat(message, opts \\ []) do
+    timeout = Keyword.get(opts, :timeout, @default_timeout)
+
     case Process.get(@agent_key) do
       nil ->
         {:error, :not_started}
 
       pid ->
-        case Agent.tool_response(pid, message) do
+        {:ok, signal} = Jido.Signal.new(%{
+          type: "jido.ai.tool.response",
+          data: %{message: message}
+        })
+
+        case Jido.Agent.Server.call(pid, signal, timeout) do
           {:ok, response} ->
             IO.puts(format_response(response))
             :ok
