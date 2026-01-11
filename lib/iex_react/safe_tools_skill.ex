@@ -3,11 +3,14 @@ defmodule IExReAct.SafeToolsSkill do
   Safe tools for the IExReAct agent - vault-only file access and allowlisted URLs.
   """
 
+  @vault_dir "vault"
+
+  def vault_dir, do: @vault_dir
+
   @doc """
   Validates a path is safe (no escapes from vault).
   Raises ArgumentError if path attempts to escape.
   """
-  @vault_dir "vault"
 
   def safe_path!(path) when is_binary(path) do
     if String.contains?(path, "..") or String.starts_with?(path, "/") do
