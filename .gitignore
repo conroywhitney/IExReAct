@@ -23,8 +23,9 @@ erl_crash.dump
 
 # Claude Code tmp
 .claude/tsc-cache
+thoughts/
+.exports/
 
 # Claude project-specific stuff
 .claude/settings.json
 
-thoughts/
