@@ -13,13 +13,15 @@ defmodule IExReAct.MixProject do
 
   def application do
     [
+      mod: {IExReAct.Application, []},
       extra_applications: [:logger, :inets, :ssl]
     ]
   end
 
   defp deps do
     [
-      {:jido_ai, "~> 0.5.2"}
+      {:jido_ai, "~> 0.5.2"},
+      {:truman_shell, path: "../truman-shell"}
     ]
   end
 end

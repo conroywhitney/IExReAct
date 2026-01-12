@@ -71,5 +71,21 @@ defmodule IExReAct.Actions do
     end
   end
 
-  def all, do: [ReadFile, WriteFile, ListFiles, FetchUrl]
+  defmodule ShellCommand do
+    use Action,
+      name: "shell",
+      description: "Executes a shell command (ls, cat, grep, etc.) in a sandboxed environment",
+      schema: [
+        command: [type: :string, required: true, doc: "Shell command to execute (e.g., 'ls -la', 'cat file.txt')"]
+      ]
+
+    def run(%{command: command}, _context) do
+      case TrumanShell.execute(command) do
+        {:ok, output} -> {:ok, %{output: output}}
+        {:error, reason} -> {:error, reason}
+      end
+    end
+  end
+
+  def all, do: [ReadFile, WriteFile, ListFiles, FetchUrl, ShellCommand]
 end
