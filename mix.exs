@@ -19,7 +19,8 @@ defmodule IExReAct.MixProject do
 
   defp deps do
     [
-      {:jido_ai, "~> 0.5.2"}
+      {:jido_ai, "~> 0.5.2"},
+      {:truman_shell, path: "../truman-shell"}
     ]
   end
 end
