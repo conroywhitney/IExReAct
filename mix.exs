@@ -13,6 +13,7 @@ defmodule IExReAct.MixProject do
 
   def application do
     [
+      mod: {IExReAct.Application, []},
       extra_applications: [:logger, :inets, :ssl]
     ]
   end
