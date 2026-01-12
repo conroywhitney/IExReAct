@@ -5,10 +5,11 @@ A minimal ReAct (Reason/Act) AI agent for Interactive Elixir, demonstrating safe
 ## What is this?
 
 IExReAct gives you a conversational AI agent in your IEx session that can:
+- Execute shell commands via **TrumanShell** (sandboxed simulation)
 - Read/write/list files (safely confined to `vault/` directory)
 - Fetch URLs (restricted to allowlisted domains)
 
-It's ~100 lines of Elixir demonstrating "security by omission" - the agent simply doesn't have dangerous capabilities like shell access or code eval.
+It demonstrates "security by omission" - the agent operates in a controlled environment where dangerous operations are either sandboxed or simply don't exist.
 
 ## Setup
 
@@ -55,6 +56,7 @@ IExReAct.clear()
 
 | Tool | Description |
 |------|-------------|
+| `shell` | Execute shell commands via TrumanShell sandbox |
 | `read_file` | Read files from `vault/` directory |
 | `write_file` | Write files to `vault/` directory (creates parent dirs) |
 | `list_files` | List files matching glob pattern in `vault/` |
@@ -89,6 +91,25 @@ lib/
     actions.ex              # Jido.Action wrappers for tools
 vault/                      # Safe zone for agent file operations
 ```
+
+## Troubleshooting
+
+### Jaxon NIF Warning
+
+If you see repeated warnings like:
+```
+[warning] The on_load function for module Elixir.Jaxon.Parsers.NifParser returned: {:error, {:load_failed, ...}}
+```
+
+This happens when the precompiled NIF binary doesn't match your architecture. Fix it by recompiling:
+
+```bash
+# Clean and recompile Jaxon
+rm -rf deps/jaxon/_build deps/jaxon/priv/*.so _build/dev/lib/jaxon
+mix deps.compile jaxon --force
+```
+
+This recompiles the native JSON parser for your system. The warning is harmless (Jaxon falls back to pure Elixir), but noisy.
 
 ## License
 
