@@ -10,9 +10,10 @@ defmodule IExReAct do
   @default_timeout 30_000
 
   @base_prompt """
-  You are a helpful assistant with access to safe file and URL tools.
+  You are a helpful assistant with access to safe file, URL, and shell tools.
   You can read, write, and list files within the vault directory.
   You can fetch content from allowlisted URLs (github.com, hexdocs.pm, etc.).
+  You can execute shell commands (ls, cat, grep, etc.) in a sandboxed environment.
   """
 
   def start(opts \\ []) do
