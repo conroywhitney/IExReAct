@@ -10,7 +10,7 @@ defmodule IExReAct.LoggerFilterTest do
       result = LoggerFilter.filter(event, [])
 
       assert %{msg: {:string, redacted}} = result
-      assert redacted == "Key: [REDACTED_ANTHROPIC_KEY]"
+      assert redacted == "Key: [REDACTED]"
     end
 
     test "redacts OpenAI API keys" do
@@ -19,7 +19,7 @@ defmodule IExReAct.LoggerFilterTest do
       result = LoggerFilter.filter(event, [])
 
       assert %{msg: {:string, redacted}} = result
-      assert redacted == "Key: [REDACTED_OPENAI_KEY]"
+      assert redacted == "Key: [REDACTED]"
     end
 
     test "redacts api_key field pattern in inspect output" do
@@ -28,8 +28,10 @@ defmodule IExReAct.LoggerFilterTest do
       result = LoggerFilter.filter(event, [])
 
       assert %{msg: {:string, redacted}} = result
-      assert redacted =~ ~s(api_key: "[REDACTED]")
+      # The whole api_key: "..." pattern is replaced with [REDACTED]
+      assert redacted =~ "[REDACTED]"
       assert redacted =~ ~s(model: "gpt-4")
+      refute redacted =~ "secret-key-here"
     end
 
     test "passes through non-sensitive strings unchanged" do
@@ -81,7 +83,7 @@ defmodule IExReAct.LoggerFilterTest do
 
       result = LoggerFilter.filter(event, [])
 
-      assert %{msg: {"Key is ~s", ["[REDACTED_ANTHROPIC_KEY]"]}} = result
+      assert %{msg: {"Key is ~s", ["[REDACTED]"]}} = result
     end
   end
 
@@ -99,7 +101,7 @@ defmodule IExReAct.LoggerFilterTest do
 
       result = LoggerFilter.filter(event, [])
 
-      assert %{msg: "[REDACTED_ANTHROPIC_KEY]"} = result
+      assert %{msg: "[REDACTED]"} = result
     end
   end
 end

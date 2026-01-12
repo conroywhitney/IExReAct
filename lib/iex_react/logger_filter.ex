@@ -52,17 +52,23 @@ defmodule IExReAct.LoggerFilter do
 
   defp redact_message(other), do: other
 
-  # Redact sensitive patterns in strings
-  defp redact_string(str) when is_binary(str) do
-    str
+  # Patterns that indicate sensitive data - order matters (most specific first)
+  @secret_patterns [
     # Anthropic API keys: sk-ant-api03-...
-    |> String.replace(~r/sk-ant-api\d+-[A-Za-z0-9_-]{40,}/, "[REDACTED_ANTHROPIC_KEY]")
-    # OpenAI API keys: sk-...
-    |> String.replace(~r/sk-[A-Za-z0-9]{32,}/, "[REDACTED_OPENAI_KEY]")
+    ~r/sk-ant-api\d+-[A-Za-z0-9_-]{40,}/,
+    # OpenAI API keys: sk-... (32+ chars)
+    ~r/sk-[A-Za-z0-9]{32,}/,
     # Generic API key patterns in inspect output: api_key: "..."
-    |> String.replace(~r/api_key:\s*"[^"]+"/i, ~s(api_key: "[REDACTED]"))
-    # Struct field format: api_key: "..."
-    |> String.replace(~r/:api_key\s*=>\s*"[^"]+"/i, ~s(:api_key => "[REDACTED]"))
+    ~r/api_key:\s*"[^"]+"/i,
+    # Struct field format: :api_key => "..."
+    ~r/:api_key\s*=>\s*"[^"]+"/i
+  ]
+
+  # Redact sensitive patterns in strings - all become [REDACTED]
+  defp redact_string(str) when is_binary(str) do
+    Enum.reduce(@secret_patterns, str, fn pattern, acc ->
+      String.replace(acc, pattern, "[REDACTED]")
+    end)
   end
 
   defp redact_string(other), do: other
