@@ -8,3 +8,24 @@ erl_crash.dump
 *.beam
 /config/*.secret.exs
 .elixir_ls/
+
+# Claudebox
+.claudebox/
+
+.DS_Store
+
+# Environment
+.env
+
+# Vault contents (keep structure)
+/vault/*
+!/vault/.gitkeep
+
+# Claude Code tmp
+.claude/tsc-cache
+thoughts/
+.exports/
+
+# Claude project-specific stuff
+.claude/settings.json
+
