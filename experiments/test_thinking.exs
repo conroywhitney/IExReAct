@@ -35,12 +35,14 @@ test/
 ```
 """
 
+model = "claude-opus-4-5-20251101"
+
 body = %{
-  model: "claude-sonnet-4-20250514",
-  max_tokens: 8000,
+  model: model,
+  max_tokens: 16000,
   thinking: %{
     type: "enabled",
-    budget_tokens: 4000
+    budget_tokens: 10000
   },
   messages: [
     %{
@@ -76,7 +78,8 @@ case response.status do
 
     # Save raw JSON response
     timestamp = DateTime.utc_now() |> DateTime.to_iso8601() |> String.replace(":", "-")
-    json_file = "thinking_response_#{timestamp}.json"
+    model_short = model |> String.split("-") |> Enum.take(2) |> Enum.join("-")
+    json_file = "experiments/thinking_#{model_short}_#{timestamp}.json"
     File.write!(json_file, Jason.encode!(data, pretty: true))
     IO.puts("📁 Saved raw response to: #{json_file}\n")
 
