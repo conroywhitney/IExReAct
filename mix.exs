@@ -20,7 +20,8 @@ defmodule IExReAct.MixProject do
 
   defp deps do
     [
-      {:jido_ai, "~> 0.5.2"},
+      # Local fork for extended thinking support
+      {:jido_ai, path: "../github/jido_ai"},
       {:truman_shell, path: "../truman-shell"}
     ]
   end
