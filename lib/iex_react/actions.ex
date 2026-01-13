@@ -79,11 +79,16 @@ defmodule IExReAct.Actions do
         command: [type: :string, required: true, doc: "Shell command to execute (e.g., 'ls -la', 'cat file.txt')"]
       ]
 
-    # Track whether we've shown the header this session
-    # For now, always show it (stateless) - can add GenServer state later
+    # Header variant is read from Application env (set by IExReAct.start)
+    # We use Application env because Jido spawns tools in separate processes,
+    # so Process dictionary doesn't work.
+    # Supported variants: :concierge (default), :surveillance, :minimal, :none
     def run(%{command: command}, _context) do
+      # Get header from Application env (cross-process safe)
+      header = Application.get_env(:iex_react, :truman_header, :concierge)
+
       with {:ok, parsed} <- TrumanShell.parse(command) do
-        case TrumanShell.Executor.run_interactive(parsed, raw_command: command) do
+        case TrumanShell.Executor.run_interactive(parsed, header: header, raw_command: command) do
           {:ok, output} -> {:ok, %{output: output}}
           {:error, reason} -> {:error, reason}
         end

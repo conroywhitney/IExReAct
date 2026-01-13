@@ -1,6 +1,21 @@
 defmodule IExReAct do
   @moduledoc """
   A minimal ReAct agent for IEx demonstrating safe tool use.
+
+  ## Options
+
+    * `:model` - Model to use (default: "claude-opus-4-5-20251101")
+    * `:truman_header` - Truman Shell header variant:
+      * `:concierge` - Friendly "bash concierge" framing (default)
+      * `:surveillance` - Original "sandboxed environment" framing
+      * `:minimal` - Just the :: commands
+      * `:none` - No header
+
+  ## Example
+
+      iex> IExReAct.start(truman_header: :surveillance)
+      {:ok, #PID<...>}
+
   """
 
   alias Jido.AI.Model
@@ -18,16 +33,24 @@ defmodule IExReAct do
 
   def start(opts \\ []) do
     model_name = Keyword.get(opts, :model, @default_model)
+    truman_header = Keyword.get(opts, :truman_header, :concierge)
 
     case Model.from({:anthropic, model: model_name}) do
       {:ok, model} ->
         state = %{
           model: model,
           tools: IExReAct.Actions.all(),
-          history: []
+          history: [],
+          truman_header: truman_header
         }
 
+        # Store in Process dict (for local access)
         Process.put(:iex_react_state, state)
+
+        # Also store truman_header in Application env (for cross-process access)
+        # Jido spawns tool calls in separate processes, so Process dict won't work
+        Application.put_env(:iex_react, :truman_header, truman_header)
+
         {:ok, self()}
 
       {:error, reason} ->
@@ -53,11 +76,14 @@ defmodule IExReAct do
           verbose: Keyword.get(opts, :verbose, false)
         }
 
+        # Context carries truman_header to ShellCommand action
+        context = %{truman_header: state.truman_header}
+
         # Call the action directly with our timeout
         case Jido.Exec.run(
                Jido.AI.Actions.Langchain.ToolResponse,
                params,
-               %{},
+               context,
                timeout: timeout
              ) do
           {:ok, %{result: result}} ->
