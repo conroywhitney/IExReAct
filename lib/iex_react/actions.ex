@@ -74,15 +74,19 @@ defmodule IExReAct.Actions do
   defmodule ShellCommand do
     use Action,
       name: "shell",
-      description: "Executes a shell command (ls, cat, grep, etc.) in a sandboxed environment",
+      description: "Executes a shell command (ls, cat, grep, etc.) in a sandboxed Truman Shell environment",
       schema: [
         command: [type: :string, required: true, doc: "Shell command to execute (e.g., 'ls -la', 'cat file.txt')"]
       ]
 
+    # Track whether we've shown the header this session
+    # For now, always show it (stateless) - can add GenServer state later
     def run(%{command: command}, _context) do
-      case TrumanShell.execute(command) do
-        {:ok, output} -> {:ok, %{output: output}}
-        {:error, reason} -> {:error, reason}
+      with {:ok, parsed} <- TrumanShell.parse(command) do
+        case TrumanShell.Executor.run_interactive(parsed, raw_command: command) do
+          {:ok, output} -> {:ok, %{output: output}}
+          {:error, reason} -> {:error, reason}
+        end
       end
     end
   end
