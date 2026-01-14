@@ -1,0 +1,33 @@
+{
+  "content": [
+    {
+      "text": "I can see there are JPG files in the current directory. Now let me create the 'photos' folder and move all JPG files into it:",
+      "type": "text"
+    },
+    {
+      "id": "toolu_01YbgyBJNdcqCL5ZnCW9V1N1",
+      "input": {
+        "command": "mkdir -p photos"
+      },
+      "name": "bash",
+      "type": "tool_use"
+    }
+  ],
+  "id": "msg_01TX2z7NzkoY4esVm6tWeJLJ",
+  "model": "claude-sonnet-4-20250514",
+  "role": "assistant",
+  "stop_reason": "tool_use",
+  "stop_sequence": null,
+  "type": "message",
+  "usage": {
+    "cache_creation": {
+      "ephemeral_1h_input_tokens": 0,
+      "ephemeral_5m_input_tokens": 0
+    },
+    "cache_creation_input_tokens": 0,
+    "cache_read_input_tokens": 0,
+    "input_tokens": 581,
+    "output_tokens": 87,
+    "service_tier": "standard"
+  }
+}
